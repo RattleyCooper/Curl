@@ -19,6 +19,7 @@ Documentation is located in the `Curler.php` file for now.
 ## Examples
 
 #### Getting a web-page
+Grab the HTML for a web page to be displayed in the web browser without rendering the HTML.
 ```php
 $curler = new Curler('https://github.com/');
 
@@ -29,7 +30,7 @@ $curler->followRedirects() // Will follow redirects option set to true.
     ->header('Host', 'github.com')
     ->header('Content-Type', 'application/x-www-form-urlencoded')
     ->cookieJar('/home/user/gitCookie') // Set a file to use as cookie jar.
-    ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed.
+    ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed automatically.
     ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.  Great for debugging!
 ;
 
