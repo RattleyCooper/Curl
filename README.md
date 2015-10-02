@@ -19,8 +19,7 @@ Documentation is located in the `Curler.php` file for now.
 ## Examples
 
 #### Getting a web-page
-```
-php
+```php
 $curler = new Curler('https://github.com/');
 
 $curler->followRedirects() // Will follow redirects option set to true.
