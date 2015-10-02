@@ -19,18 +19,21 @@ Documentation is located in the `Curler.php` file for now.
 ## Examples
 
 #### Getting a web-page
-    $curler = new Curler('https://github.com/');
-    
-    $curler->followRedirects() // Will follow redirects option set to true.
-        ->header('Connection', 'keep-alive')  // Set some headers
-        ->header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
-        ->header('Accept-Language', 'en-US,en;q=0.5')
-        ->header('Host', 'github.com')
-        ->header('Content-Type', 'application/x-www-form-urlencoded')
-        ->cookieJar('/home/parker/gitCookie') // Set a file to use as cookie jar.
-        ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed.
-        ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.
-    ;
-    
-    $html = $curler->go();
-    var_dump($html);
+'''
+php
+$curler = new Curler('https://github.com/');
+
+$curler->followRedirects() // Will follow redirects option set to true.
+    ->header('Connection', 'keep-alive')  // Set some headers
+    ->header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+    ->header('Accept-Language', 'en-US,en;q=0.5')
+    ->header('Host', 'github.com')
+    ->header('Content-Type', 'application/x-www-form-urlencoded')
+    ->cookieJar('/home/parker/gitCookie') // Set a file to use as cookie jar.
+    ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed.
+    ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.
+;
+
+$html = $curler->go();
+var_dump($html);
+'''
