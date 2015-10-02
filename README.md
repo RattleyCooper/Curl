@@ -28,7 +28,7 @@ $curler->followRedirects() // Will follow redirects option set to true.
     ->header('Accept-Language', 'en-US,en;q=0.5')
     ->header('Host', 'github.com')
     ->header('Content-Type', 'application/x-www-form-urlencoded')
-    ->cookieJar('/home/parker/gitCookie') // Set a file to use as cookie jar.
+    ->cookieJar('/home/user/gitCookie') // Set a file to use as cookie jar.
     ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed.
     ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.
 ;
