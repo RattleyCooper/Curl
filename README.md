@@ -30,9 +30,9 @@ $curler->followRedirects() // Will follow redirects option set to true.
     ->header('Content-Type', 'application/x-www-form-urlencoded')
     ->cookieJar('/home/user/gitCookie') // Set a file to use as cookie jar.
     ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed.
-    ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.
+    ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.  Great for debugging!
 ;
 
-$html = $curler->go();
+$html = $curler->go(); // Replace go() with dryRun() to get debug info on the request without executing it.
 var_dump($html);
 ```
