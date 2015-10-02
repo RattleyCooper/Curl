@@ -29,6 +29,7 @@ class Curler
     public $poststring;
     public $headers;
     public $response;
+    public $noRender;
     public $ch;
     public $handles;
     public $options;
@@ -56,6 +57,7 @@ class Curler
         $this->poststring = '';
         $this->headers = [];
         $this->response = '';
+        $this->noRender = false;
         $this->cookieJarFile = '';
 
         if( $urlCh )
@@ -88,6 +90,7 @@ class Curler
         $this->poststring = '';
         $this->headers = [];
         $this->response = '';
+        $this->noRender = false;
         $this->cookieJarFile = '';
 
         $this->ch = curl_init($url);
@@ -298,7 +301,7 @@ class Curler
     {
         // If no url is given we cannot run `curl_init` if the URL was not provided
         // on class instantiation.
-        if( ! $this->url ) { throw new Exception('Curler requires a valid URL to run.  See documentation for details.'); }
+        if( ! $this->url ) { throw new \Exception('Curler requires a valid URL to run.  See documentation for details.'); }
         // Since we have our URL set and we don't have a valid cURL handle, we need to make one.
         if( ! $this->ch ) { $this->ch = curl_init($this->url); }
 
@@ -306,10 +309,9 @@ class Curler
         $this->setHeaders()->setPostFields();
         $this->response = curl_exec($this->ch);
 
-        if($autoClose)
-        {
-            $this->closeHandle();
-        }
+        if ( $this->noRender ) { $this->response = htmlspecialchars($this->response); }
+
+        if($autoClose) { $this->closeHandle(); }
 
         return $this;
     }
@@ -664,6 +666,18 @@ class Curler
     public function suppressOutput($bool = true)
     {
         $this->setOption('CURLOPT_RETURNTRANSFER', $bool);
+        return $this;
+    }
+
+    /**
+     * Change the html characters to htmlspecialchars on `go()`.
+     * 
+     * @param bool $noRender
+     * @return $this
+     */
+    public function suppressRender($noRender = true)
+    {
+        $this->noRender = $noRender;
         return $this;
     }
 
