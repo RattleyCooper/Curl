@@ -6,15 +6,16 @@ method chaining instead of setting options explicitly using the libcurl constant
 
 Debugging cURL commands in php using the Curler class is insanely simple as well.
 Just chain the `dryRun()` method onto the end of your method chain instead of
-the `go()` method and it will dump out all of the cURL request information.
+the `go()` method and it will dump out all of the cURL request information
+without making the request.
  
 See http://php.net/manual/en/book.curl.php for information on libcurl.
 
 Note: This repo is in its infancy and may not be suitable for all
-applications, however it is great for simple requests!  Multi-
-requests will be coming soon!  Hopefully ;)
+applications, however it is great for simple and semi-advanced 
+requests.
 
-Documentation is located in the `Curler.php` file for now.
+Documentation is located in the `Curler.php` file for now, but examples on usage will be added.
 
 ## Examples
 
