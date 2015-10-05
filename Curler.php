@@ -301,7 +301,7 @@ class Curler
     {
         // If no url is given we cannot run `curl_init` if the URL was not provided
         // on class instantiation.
-        if( ! $this->url ) { throw new \Exception('Curler requires a valid URL to run.  See documentation for details.'); }
+        if( ! $this->url ) { throw new Exception('Curler requires a valid URL to run.  See documentation for details.'); }
         // Since we have our URL set and we don't have a valid cURL handle, we need to make one.
         if( ! $this->ch ) { $this->ch = curl_init($this->url); }
 
@@ -641,6 +641,13 @@ class Curler
             $this->postfields = $postfields;
         }
 
+        // If postfields is set to a string, assume the work is done and set option.
+        if ( is_string($this->poststring) and $this->poststring )
+        {
+            $this->setOption('CURLOPT_POSTFIELDS', $this->poststring);
+            return $this;
+        }
+
         if( count($this->postfields) === 0 )
         {
             return $this;
@@ -671,7 +678,7 @@ class Curler
 
     /**
      * Change the html characters to htmlspecialchars on `go()`.
-     * 
+     *
      * @param bool $noRender
      * @return $this
      */
@@ -680,6 +687,13 @@ class Curler
         $this->noRender = $noRender;
         return $this;
     }
+
+    public function setPostString($postString)
+    {
+        $this->poststring = $postString;
+        return $this;
+    }
+
 
     /**
      * Set the SSL version for the curl request.  This is not the same as the --ssl option
