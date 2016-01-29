@@ -756,11 +756,10 @@ class Curler
      * @param $filepath
      * @return $this
      */
-    public function upload($filepath, $postKey = 'file')
+    public function upload($postName, $filepath)
     {
         $filepath = '@' . $filepath;
-
-        $this->post($postKey, $filepath);
+        $this->post($postName, $filepath);
         return $this;
     }
 
