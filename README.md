@@ -42,10 +42,13 @@ var_dump($html);
 #### Debugging a request
 Debug requests with ease by chaining the `dryRun()` method to the end of your method chain and dumping the result.
 
- array:8 [▼
+This will output something similar to this:
+
+```php
+ [
    "url" => "https://github.com/"
    "cookieJarFile" => "/home/parker/gitCookie"
-   "headers" => array:5 [▼
+   "headers" => [
      "Connection" => "keep-alive"
      "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
      "Accept-Language" => "en-US,en;q=0.5"
@@ -55,12 +58,12 @@ Debug requests with ease by chaining the `dryRun()` method to the end of your me
    "postfields" => []
    "poststring" => ""
    "handles" => []
-   "options" => array:5 [▼
+   "options" => [
      "CURLOPT_FOLLOWLOCATION" => true
      "CURLOPT_COOKIEFILE" => "/home/parker/gitCookie"
      "CURLOPT_COOKIEJAR" => "/home/parker/gitCookie"
      "CURLOPT_RETURNTRANSFER" => true
-     "CURLOPT_HTTPHEADER" => array:5 [▼
+     "CURLOPT_HTTPHEADER" => [
        0 => "Connection: keep-alive"
        1 => "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
        2 => "Accept-Language: en-US,en;q=0.5"
@@ -68,7 +71,7 @@ Debug requests with ease by chaining the `dryRun()` method to the end of your me
        4 => "Content-Type: application/x-www-form-urlencoded"
      ]
    ]
-   "curl_getinfo" => array:26 [▼
+   "curl_getinfo" => [
      "url" => "https://github.com/"
      "content_type" => null
      "http_code" => 0
@@ -97,3 +100,4 @@ Debug requests with ease by chaining the `dryRun()` method to the end of your me
      "local_port" => 0
    ]
  ]
+```
