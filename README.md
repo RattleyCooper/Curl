@@ -38,3 +38,62 @@ $curler->followRedirects() // Will follow redirects option set to true.
 $html = $curler->go(); // Replace go() with dryRun() to get debug info on the request without executing it.
 var_dump($html);
 ```
+
+#### Debugging a request
+Debug requests with ease by chaining the `dryRun()` method to the end of your method chain and dumping the result.
+
+ array:8 [▼
+   "url" => "https://github.com/"
+   "cookieJarFile" => "/home/parker/gitCookie"
+   "headers" => array:5 [▼
+     "Connection" => "keep-alive"
+     "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+     "Accept-Language" => "en-US,en;q=0.5"
+     "Host" => "github.com"
+     "Content-Type" => "application/x-www-form-urlencoded"
+   ]
+   "postfields" => []
+   "poststring" => ""
+   "handles" => []
+   "options" => array:5 [▼
+     "CURLOPT_FOLLOWLOCATION" => true
+     "CURLOPT_COOKIEFILE" => "/home/parker/gitCookie"
+     "CURLOPT_COOKIEJAR" => "/home/parker/gitCookie"
+     "CURLOPT_RETURNTRANSFER" => true
+     "CURLOPT_HTTPHEADER" => array:5 [▼
+       0 => "Connection: keep-alive"
+       1 => "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+       2 => "Accept-Language: en-US,en;q=0.5"
+       3 => "Host: github.com"
+       4 => "Content-Type: application/x-www-form-urlencoded"
+     ]
+   ]
+   "curl_getinfo" => array:26 [▼
+     "url" => "https://github.com/"
+     "content_type" => null
+     "http_code" => 0
+     "header_size" => 0
+     "request_size" => 0
+     "filetime" => 0
+     "ssl_verify_result" => 0
+     "redirect_count" => 0
+     "total_time" => 0.0
+     "namelookup_time" => 0.0
+     "connect_time" => 0.0
+     "pretransfer_time" => 0.0
+     "size_upload" => 0.0
+     "size_download" => 0.0
+     "speed_download" => 0.0
+     "speed_upload" => 0.0
+     "download_content_length" => -1.0
+     "upload_content_length" => -1.0
+     "starttransfer_time" => 0.0
+     "redirect_time" => 0.0
+     "redirect_url" => ""
+     "primary_ip" => ""
+     "certinfo" => []
+     "primary_port" => 0
+     "local_ip" => ""
+     "local_port" => 0
+   ]
+ ]
