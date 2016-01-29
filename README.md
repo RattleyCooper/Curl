@@ -78,6 +78,10 @@ foreach ( $urls as $url )
 }
 
 $html = $curler->goMulti()->multi_response;
+
+/*
+Returns an array containing each requests response as it's own item, in the array.
+*/
  ```
 
 #### Debugging a request
