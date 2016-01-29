@@ -45,37 +45,37 @@ You can send asynchronous requests as well!
 ```php
 $curler = new Curler('https://github.com/');
 
-        $urls = [
-            'http://pastebin.com/',
-            'https://google.com/',
-            'http://yahoo.com/'
-        ];
+$urls = [
+    'http://pastebin.com/',
+    'https://google.com/',
+    'http://yahoo.com/'
+];
 
-        $headers = [
-            'Connection'        =>      'keep-alive',
-            'Accept'            =>      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language'   =>      'en-US,en;q=0.5',
-            'Content-Type'      =>      'application/x-www-form-urlencoded'
-        ];
+$headers = [
+    'Connection'        =>      'keep-alive',
+    'Accept'            =>      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language'   =>      'en-US,en;q=0.5',
+    'Content-Type'      =>      'application/x-www-form-urlencoded'
+];
 
-        $cj = '/home/parker/testCookie';
+$cj = '/home/parker/testCookie';
 
-        $curler->followRedirects()
-            ->headerArray($headers)
-            ->cookieJar($cj)
-            ->multiCookie()
-            ->suppressOutput()
-            ->suppressRender()
-            ->setHeaders()
-            ->setPostFields()
-        ;
+$curler->followRedirects()
+    ->headerArray($headers)
+    ->cookieJar($cj)
+    ->multiCookie()
+    ->suppressOutput()
+    ->suppressRender()
+    ->setHeaders()
+    ->setPostFields()
+;
 
-        foreach ( $urls as $url )
-        {
-            $curler->addUrl($url);
-        }
+foreach ( $urls as $url )
+{
+    $curler->addUrl($url);
+}
 
-        $html = $curler->goMulti()->multi_response;
+$html = $curler->goMulti()->multi_response;
  ```
 
 #### Debugging a request
