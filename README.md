@@ -40,7 +40,9 @@ var_dump($html);
 ```
 
 #### Preforming a multi-request
-You can send asynchronous requests as well!
+You can send asynchronous requests as well!  This can be accomplished through the use of curler by
+adding URLs to the request(this retains any options that have been set in Curler up to this point),
+or by adding cURL handles to the request.
 
 ```php
 $curler = new Curler('https://github.com/');
@@ -72,7 +74,7 @@ $curler->followRedirects()
 
 foreach ( $urls as $url )
 {
-    $curler->addUrl($url);
+    $curler->addUrl($url); // $curler->addHandle($validCurlHandle); would work as well.
 }
 
 $html = $curler->goMulti()->multi_response;
@@ -81,7 +83,7 @@ $html = $curler->goMulti()->multi_response;
 #### Debugging a request
 Debug requests with ease by chaining the `dryRun()` method to the end of your method chain and dumping the result.
 
-This will output something similar to this(consider using something like Symfony's `VarDumper` or Laravels dump and die - `dd()`):
+This will output something similar to this(consider using something like Symfony's `VarDumper` or Laravels dump and die - `dd()`):  **Note that this is not yet implimented for multi-requests!!!**
 
 ```php
  [
