@@ -1,16 +1,14 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Wykleph
+ * User: parker
  * Date: 9/2/15
  * Time: 7:26 AM
  */
 
-// Set the namespace if needed.
-
 /**
- * A fluent API wrapper for `libcurl` in php.  Setting options and headers is done using
- * method chaining instead of setting options explicitly using the `libcurl` constants.
+ * A fluent API wrapper for libcurl in php.  Setting options and headers is done using
+ * method chaining instead of setting options explicitly using the libcurl constants.
  *
  * Debugging cURL commands in php using the Curler class is insanely simple as well.
  * Just chain the `dryRun()` method onto the end of your method chain instead of
@@ -19,8 +17,9 @@
  * See http://php.net/manual/en/book.curl.php for information on libcurl.
  *
  * Note: This class is in its infancy and may not be suitable for all
- * applications, however it is great for simple requests!  Multi-
- * requests will be coming soon! Hopefully :P
+ * applications, however it is great for simple requests!
+ *
+ * Todo: Clean up code / make it more readable.  Add more usage examples to github.
  */
 class Curler
 {
@@ -31,8 +30,13 @@ class Curler
     public $response;
     public $noRender;
     public $ch;
+    public $cmh;
     public $handles;
     public $options;
+    public $errors;
+    public $multi_response;
+    public $multi_active;
+    public $multi_cookie;
     private $optionsMap;
 
     /**
@@ -67,10 +71,16 @@ class Curler
         {
             $this->ch = false;
         }
-
+        $this->cmh = curl_multi_init();
+        $this->multi_active = null;
+        $this->multi_response = [];
         $this->handles = [];
+        $this->urls = [];
+        $this->multi_cookie = true;
 
         $this->options = [];
+
+        $this->errors = false;
         return $this;
     }
 
@@ -94,7 +104,12 @@ class Curler
         $this->cookieJarFile = '';
 
         $this->ch = curl_init($url);
+        $this->cmh = curl_multi_init();
+        $this->multi_active = null;
+        $this->multi_response = [];
         $this->handles = [];
+        $this->urls = [];
+        $this->multi_cookie = true;
 
         $this->options = [];
         return $this;
@@ -122,15 +137,61 @@ class Curler
     }
 
     /**
-     * If the Curler object is echoed, it will show value of the response attribute.
+     * If the Curler object is echoed, it will show the value of the response attribute.
+     * This is the same as doing $this->dryRun()
      *
      * @return string
      */
     public function __toString()
     {
-        return (string) $this->response;
+        return $this->dryRun();
     }
 
+    /**
+     * Add a cURL handle to the list of cURL handles to execute during a multi-request.
+     *
+     * @param $ch
+     * @return $this
+     * @throws \Exception
+     */
+    public function addHandle($ch)
+    {
+        if( ! gettype($this->ch) == 'resource' and ! get_resource_type($this->ch) == 'curl' )
+        {
+            throw new \Exception("`addHandle()` requires a valid curl resource to run.");
+        }
+
+        //curl_multi_add_handle($this->cmh, $ch);
+        $this->handles[] = $ch;
+        return $this;
+    }
+
+    /**
+     * Add a url to the list of urls to create cURL handles out of.  These handles will inherit
+     * the same options and headers as the parent cURL handle that was created and modified
+     * with Curler.
+     *
+     * @param $url
+     * @return $this
+     */
+    public function addUrl($url)
+    {
+        $this->urls[] = $url;
+        return $this;
+    }
+
+    /**
+     * Change the html characters to htmlspecialchars on `go()`.  HTML will not be rendered by a browser
+     *
+     * @param bool $noRender
+     * @return $this
+     */
+    public function suppressRender($noRender = true)
+    {
+        $this->noRender = $noRender;
+        return $this;
+    }
+    
     /**
      * Close the current curl handle.
      *
@@ -156,8 +217,6 @@ class Curler
      */
     public function compressedResponse($compressionType = '')
     {
-	// Option map used here.  See the `setOption()` documentation
-	// to see how it's handled.
         $this->setOption('--compressed');
         return $this;
     }
@@ -231,6 +290,17 @@ class Curler
     }
 
     /**
+     * Returns `true` if Curler encountered errors with the request and `false` if it
+     * did not encounter errors.
+     *
+     * @return bool
+     */
+    public function hasErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
      * Tell Curler that it should follow redirects.
      *
      * See http://php.net/manual/en/function.curl-setopt.php for more information.
@@ -295,13 +365,13 @@ class Curler
      *
      * @param bool $autoClose
      * @return $this
-     * @throws Exception
+     * @throws \Exception
      */
     public function go($autoClose = true)
     {
         // If no url is given we cannot run `curl_init` if the URL was not provided
         // on class instantiation.
-        if( ! $this->url ) { throw new Exception('Curler requires a valid URL to run.  See documentation for details.'); }
+        if( ! $this->url ) { throw new \Exception('Curler requires a valid URL to run.  See documentation for details.'); }
         // Since we have our URL set and we don't have a valid cURL handle, we need to make one.
         if( ! $this->ch ) { $this->ch = curl_init($this->url); }
 
@@ -309,9 +379,99 @@ class Curler
         $this->setHeaders()->setPostFields();
         $this->response = curl_exec($this->ch);
 
+        // Check to see if the request was successful or not.  Set the errors attribute accordingly
+        if ( $this->response === false )
+        {
+            $this->errors = true;
+        }
+
+        // Should the output HTML be renderable?
         if ( $this->noRender ) { $this->response = htmlspecialchars($this->response); }
 
-        if($autoClose) { $this->closeHandle(); }
+        // Should the cURL handle be closed automatically?
+        if( $autoClose ) { $this->closeHandle(); }
+
+        return $this;
+    }
+
+    private function copyHandleChangeUrl($url)
+    {
+        $ch = $this->copy();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $this->handles[] = $ch;
+        return $this;
+    }
+
+    public function multiCookie($bool=true)
+    {
+        if ( $this->cookieJarFile == '' )
+        {
+            throw new \Exception("You must set up the cookie jar before calling `multiCookie()`");
+        }
+        $this->multi_cookie = $bool;
+        return $this;
+    }
+
+    /**
+     * Start the cURL multi-request
+     *
+     * todo:  add chunking mechanisms so that these multi-requests can be optimized further.
+     *
+     * @return $this
+     */
+    public function goMulti()
+    {
+        $multi = [];
+        $mhinfo = false;
+
+        // Add main cURL handle to the list of cURL handles
+        $this->handles[] = $this->ch;
+
+        // Copy curl handle and replace the url option with the new url for each one in list.
+        if ( count($this->urls) > 0 )
+        {
+            foreach ( $this->urls as $urlKey=>$url )
+            {
+                $this->copyHandleChangeUrl($url);
+                //unset($this->urls[$urlKey]);
+            }
+        }
+
+        // Set up the multi-handles!
+        if ( count($this->handles) > 0 )
+        {
+            foreach ( $this->handles as $handleKey=>$handle )
+            {
+                // Should we use seperate cookies for each request?
+                if ( $this->multi_cookie )
+                {
+                    curl_setopt($handle, CURLOPT_COOKIEFILE, "{$this->cookieJarFile}{$handleKey}");
+                    curl_setopt($handle, CURLOPT_COOKIEJAR, "{$this->cookieJarFile}{$handleKey}");
+                }
+
+                // Add handle to the multi-handle
+                curl_multi_add_handle($this->cmh, $handle);
+                //unset($this->handles[$handleKey]);
+            }
+        }
+
+        //set_time_limit(6000);
+
+        //dd([$this->handles, $this->cmh]);
+
+        $running = null;
+        do {
+            curl_multi_exec($this->cmh, $running);
+        } while ( $running > 0 );
+
+
+        foreach ( $this->handles as $hKey=>$handle )
+        {
+            $this->multi_response[$hKey] = curl_multi_getcontent($handle);
+            curl_multi_remove_handle($this->cmh, $handle);
+        }
+
+        curl_multi_close($this->cmh);
 
         return $this;
     }
@@ -350,6 +510,25 @@ class Curler
         return $this;
     }
 
+    /**
+     * Log into service.
+     *
+     * @param $username
+     * @param $password
+     * @param LoginInterface $loginHandler
+     * @param array $extraAttributes
+     * @return mixed
+     */
+    public function login($username, $password, LoginInterface $loginHandler, $extraAttributes = [])
+    {
+        $loginHandler->setUsername($username)
+            ->setPassword($password)
+            ->setAttributes($extraAttributes)
+        ;
+
+        return $loginHandler->login();
+    }
+    
     /**
      * Set Curler to include the request headers in the output.
      *
@@ -395,6 +574,7 @@ class Curler
             'PUT'
         ];
 
+        // Check for valid HTTP methods.
         if ( ! in_array($method, $validMethods) )
         {
             throw new \Exception("{$method} is not a valid method type.");
@@ -411,13 +591,14 @@ class Curler
      *
      * @curl_option CURLOPT_STDERR
      * @param $fileHandle
-     * @return $this|Exception
+     * @return $this
+     * @throws \Exception
      */
     public function outputTo($fileHandle)
     {
         if( get_resource_type($fileHandle) !== 'file' )
         {
-            return new Exception('$fileHandle must be an open file handle.  No file handle was provided.');
+            throw new \Exception('$fileHandle must be an open file handle.  No file handle was provided.');
         }
 
         $this->setOption('CURLOPT_STDERR', $fileHandle);
@@ -576,14 +757,14 @@ class Curler
      * @param bool $headers
      * @return $this|Exception
      */
-    private function setHeaders($headers = false)
+    public function setHeaders($headers = false)
     {
         if( is_array($headers) )
         {
             $this->headers = $headers;
         }elseif($headers !== false)
         {
-            return new Exception('$headers must be an associative array of header keys and header values.');
+            return new \Exception('$headers must be an associative array of header keys and header values.');
         }
 
         if( count($this->headers) === 0 )
@@ -624,6 +805,12 @@ class Curler
         return $this;
     }
 
+    public function setPostString($postString)
+    {
+        $this->poststring = $postString;
+        return $this;
+    }
+
     /**
      * Similar to `setHeaders()`.  Pass an associative array of ALL the post fields you would like to use
      * `setPostFields` should only be called once before `curl_exec` is called
@@ -634,14 +821,14 @@ class Curler
      * @param bool $postfields
      * @return $this
      */
-    private function setPostFields($postfields = false)
+    public function setPostFields($postfields = false)
     {
         if( is_array($postfields) )
         {
             $this->postfields = $postfields;
         }
 
-        // If postfields is set to a string, assume the work is done and set option.
+        // If poststring is set to a string, assume the work is done and set option.
         if ( is_string($this->poststring) and $this->poststring )
         {
             $this->setOption('CURLOPT_POSTFIELDS', $this->poststring);
@@ -675,25 +862,6 @@ class Curler
         $this->setOption('CURLOPT_RETURNTRANSFER', $bool);
         return $this;
     }
-
-    /**
-     * Change the html characters to htmlspecialchars on `go()`.
-     *
-     * @param bool $noRender
-     * @return $this
-     */
-    public function suppressRender($noRender = true)
-    {
-        $this->noRender = $noRender;
-        return $this;
-    }
-
-    public function setPostString($postString)
-    {
-        $this->poststring = $postString;
-        return $this;
-    }
-
 
     /**
      * Set the SSL version for the curl request.  This is not the same as the --ssl option
@@ -752,13 +920,14 @@ class Curler
     /**
      * Upload a file using a filepath and the `name` of the form element.
      *
-     * @param string $postKey
+     * @param string $postName
      * @param $filepath
      * @return $this
      */
     public function upload($postName, $filepath)
     {
         $filepath = '@' . $filepath;
+
         $this->post($postName, $filepath);
         return $this;
     }
