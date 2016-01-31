@@ -6,9 +6,6 @@
  * Time: 7:26 AM
  */
 
-namespace App\src\Curl;
-use App\src\Interfaces\WrapsLibCurl;
-
 /**
  * A fluent API wrapper for libcurl in php.  Setting options and headers is done using
  * method chaining instead of setting options explicitly using the libcurl constants.
@@ -25,7 +22,7 @@ use App\src\Interfaces\WrapsLibCurl;
  *
  * Todo: Clean up code / make it more readable.  Add more usage examples to github.
  */
-class Curler implements WrapsLibCurl
+class Curler
 {
     public $url;
     public $postfields;
@@ -1040,7 +1037,7 @@ class Curler implements WrapsLibCurl
      * @param $filename
      * @return $this
      */
-    public function writeResponse($filename)
+public function writeResponse($filename)
     {
         file_put_contents($filename, $this->response);
         return $this;
