@@ -1,1 +1,32 @@
-"require": {}
+{
+    "name":                 "wykleph/curl",
+    "description":          "Simple synchronous and asynchronous cURL requests in php.",
+    "homepage":             "https://github.com/Wykleph/Curl",
+    "keywords": [
+        "curl",
+        "web",
+        "internet",
+        "automation",
+        "asyncronous",
+        "web request",
+        "requests",
+        "request"
+    ],
+    "type":                 "library",
+    "license":              "MIT",
+    "authors": [
+        {
+            "name": "Parker Young",
+            "email": "wykleph@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.5.29"
+    },
+    "autoload": {
+        "psr-0": {
+            "Curler": "src"
+        }
+    }
+}
