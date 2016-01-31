@@ -17,7 +17,8 @@
  * See http://php.net/manual/en/book.curl.php for information on libcurl.
  *
  * Note: This class is in its infancy and may not be suitable for all
- * applications, however it is great for simple requests!
+ * applications, however it is great for simple requests!  Multi-
+ * requests will be coming soon(hopefully)!
  *
  * Todo: Clean up code / make it more readable.  Add more usage examples to github.
  */
@@ -25,8 +26,10 @@ class Curler
 {
     public $url;
     public $postfields;
+    private $postfields_set;
     public $poststring;
     public $headers;
+    private $headers_set;
     public $response;
     public $noRender;
     public $ch;
@@ -58,8 +61,10 @@ class Curler
 
         $this->url = $urlCh;
         $this->postfields = [];
+        $this->postfields_set = false;
         $this->poststring = '';
         $this->headers = [];
+        $this->headers_set = false;
         $this->response = '';
         $this->noRender = false;
         $this->cookieJarFile = '';
@@ -97,8 +102,10 @@ class Curler
         $this->resetOptions();
         $this->url = $url;
         $this->postfields = [];
+        $this->postfields_set = false;
         $this->poststring = '';
         $this->headers = [];
+        $this->headers_set = false;
         $this->response = '';
         $this->noRender = false;
         $this->cookieJarFile = '';
@@ -156,13 +163,33 @@ class Curler
      */
     public function addHandle($ch)
     {
+        if ( is_array($ch) ) { return $this->addHandles($ch); }
+
         if( ! gettype($this->ch) == 'resource' and ! get_resource_type($this->ch) == 'curl' )
         {
             throw new \Exception("`addHandle()` requires a valid curl resource to run.");
         }
 
-        //curl_multi_add_handle($this->cmh, $ch);
         $this->handles[] = $ch;
+        return $this;
+    }
+
+    /**
+     * Add an array of cURL handles to the list of cURL handles to execute during a multi-request.
+     *
+     * @param $curlHandles
+     * @return $this
+     * @throws \Exception
+     */
+    public function addHandles($curlHandles)
+    {
+        if ( ! is_array($curlHandles) )
+        {
+            throw new \Exception("addHandles() takes an array of curl handles.");
+        }
+
+        foreach ( $curlHandles as $curlHandle ) { $this->addHandle($curlHandle); }
+
         return $this;
     }
 
@@ -176,7 +203,22 @@ class Curler
      */
     public function addUrl($url)
     {
+        if ( is_array($url) ) { return $this->addUrls($url); }
         $this->urls[] = $url;
+        return $this;
+    }
+
+    public function addUrls($urls)
+    {
+        if ( ! is_array($urls) )
+        {
+            throw new \Exception("");
+        }
+
+        foreach ( $urls as $url )
+        {
+            $this->addUrl($url);
+        }
         return $this;
     }
 
@@ -394,12 +436,17 @@ class Curler
         return $this;
     }
 
+    /**
+     * Copy the main cURL handle and change the URL.
+     *
+     * @param $url
+     * @return $this
+     */
     private function copyHandleChangeUrl($url)
     {
         $ch = $this->copy();
         curl_setopt($ch, CURLOPT_URL, $url);
-        $this->handles[] = $ch;
-        return $this;
+        return $ch;
     }
 
     public function multiCookie($bool=true)
@@ -421,19 +468,20 @@ class Curler
      */
     public function goMulti()
     {
-        $multi = [];
-        $mhinfo = false;
+        // Set the headers and post fields like in the `go()` method.
+        if ( ! $this->headers_set ) { $this->setHeaders(); }
+        if ( ! $this->postfields_set ) { $this->setPostFields(); }
 
         // Add main cURL handle to the list of cURL handles
         $this->handles[] = $this->ch;
 
         // Copy curl handle and replace the url option with the new url for each one in list.
+        // This will retain the options that have been set.
         if ( count($this->urls) > 0 )
         {
             foreach ( $this->urls as $urlKey=>$url )
             {
-                $this->copyHandleChangeUrl($url);
-                //unset($this->urls[$urlKey]);
+                $this->handles[] = $this->copyHandleChangeUrl($url);
             }
         }
 
@@ -442,7 +490,7 @@ class Curler
         {
             foreach ( $this->handles as $handleKey=>$handle )
             {
-                // Should we use seperate cookies for each request?
+                // Should we use separate cookies for each request?
                 if ( $this->multi_cookie )
                 {
                     curl_setopt($handle, CURLOPT_COOKIEFILE, "{$this->cookieJarFile}{$handleKey}");
@@ -451,19 +499,13 @@ class Curler
 
                 // Add handle to the multi-handle
                 curl_multi_add_handle($this->cmh, $handle);
-                //unset($this->handles[$handleKey]);
             }
         }
-
-        //set_time_limit(6000);
-
-        //dd([$this->handles, $this->cmh]);
 
         $running = null;
         do {
             curl_multi_exec($this->cmh, $running);
         } while ( $running > 0 );
-
 
         foreach ( $this->handles as $hKey=>$handle )
         {
@@ -755,7 +797,7 @@ class Curler
      *
      * @curl_option CURLOPT_HTTPHEADER
      * @param bool $headers
-     * @return $this|Exception
+     * @return $this|\Exception
      */
     public function setHeaders($headers = false)
     {
@@ -775,10 +817,11 @@ class Curler
         $headerStrings = [];
         foreach($this->headers as $key=>$value)
         {
-            $headerStrings[] = "{$key}: {$value}";
+            $headerStrings[] = "{trim($key)}: {trim($value})";
         }
 
         $this->setOption('CURLOPT_HTTPHEADER', $headerStrings);
+        $this->headers_set = true;
         return $this;
     }
 
@@ -844,6 +887,7 @@ class Curler
         $this->poststring = $this->decode($httpBuilt);
 
         $this->setOption('CURLOPT_POSTFIELDS', $this->poststring);
+        $this->postfields_set = true;
         return $this;
     }
 
@@ -857,7 +901,7 @@ class Curler
      * @param bool $bool
      * @return $this
      */
-    public function suppressOutput($bool = true)
+    public function returnText($bool = true)
     {
         $this->setOption('CURLOPT_RETURNTRANSFER', $bool);
         return $this;
