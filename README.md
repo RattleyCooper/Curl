@@ -146,7 +146,7 @@ var_dump($html);
 #### Debugging a request
 Debug requests with ease by chaining the `dryRun()` method to the end of your method chain and dumping the result.
 
-This will output something similar to this(consider using something like Symfony's `VarDumper` or Laravels dump and die - `dd()`):  **Note that this is not yet implimented for multi-requests!!!**
+This will output something similar to this(consider using something like Symfony's `VarDumper` or Laravels dump and die - `dd()`):
 
 ```php
  [
