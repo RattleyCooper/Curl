@@ -6,6 +6,9 @@
  * Time: 7:26 AM
  */
 
+namespace App\src\Curl;
+use App\src\Interfaces\WrapsLibCurl;
+
 /**
  * A fluent API wrapper for libcurl in php.  Setting options and headers is done using
  * method chaining instead of setting options explicitly using the libcurl constants.
@@ -22,7 +25,7 @@
  *
  * Todo: Clean up code / make it more readable.  Add more usage examples to github.
  */
-class Curler
+class Curler implements WrapsLibCurl
 {
     public $url;
     public $postfields;
@@ -41,6 +44,8 @@ class Curler
     public $multi_active;
     public $multi_cookie;
     private $optionsMap;
+    public $cookieJarFile;
+    public $additionalCookies;
 
     /**
      * Instantiate with a valid URL.
@@ -68,6 +73,7 @@ class Curler
         $this->response = '';
         $this->noRender = false;
         $this->cookieJarFile = '';
+        $this->additionalCookies = [];
 
         if( $urlCh )
         {
@@ -109,6 +115,7 @@ class Curler
         $this->response = '';
         $this->noRender = false;
         $this->cookieJarFile = '';
+        $this->additionalCookies = [];
 
         $this->ch = curl_init($url);
         $this->cmh = curl_multi_init();
@@ -310,7 +317,9 @@ class Curler
     {
         $this->setHeaders()->setPostFields();
         $data['url'] = $this->url;
+        $data['urls'] = $this->urls;
         $data['cookieJarFile'] = $this->cookieJarFile;
+        $data['additionalCookies'] = $this->additionalCookies;
         $data['headers'] = $this->headers;
         $data['postfields'] = $this->postfields;
         $data['poststring'] = $this->poststring;
@@ -449,6 +458,15 @@ class Curler
         return $ch;
     }
 
+    /**
+     * Enable multi-cookies.  Each url or handle that is used in the multi-request will
+     * have it's own cookie which is numbered after the index value of the corresponding
+     * cURL handle in $this->handles.
+     *
+     * @param bool $bool
+     * @return $this
+     * @throws \Exception
+     */
     public function multiCookie($bool=true)
     {
         if ( $this->cookieJarFile == '' )
@@ -493,6 +511,7 @@ class Curler
                 // Should we use separate cookies for each request?
                 if ( $this->multi_cookie )
                 {
+                    $this->additionalCookies[$handleKey] = "{$this->cookieJarFile}{$handleKey}";
                     curl_setopt($handle, CURLOPT_COOKIEFILE, "{$this->cookieJarFile}{$handleKey}");
                     curl_setopt($handle, CURLOPT_COOKIEJAR, "{$this->cookieJarFile}{$handleKey}");
                 }
@@ -509,7 +528,15 @@ class Curler
 
         foreach ( $this->handles as $hKey=>$handle )
         {
-            $this->multi_response[$hKey] = curl_multi_getcontent($handle);
+            // Should the output HTML be renderable?
+            if ( $this->noRender )
+            {
+                $this->multi_response[$hKey] = htmlspecialchars(curl_multi_getcontent($handle));
+            }else
+            {
+                $this->multi_response[$hKey] = curl_multi_getcontent($handle);
+            }
+
             curl_multi_remove_handle($this->cmh, $handle);
         }
 
