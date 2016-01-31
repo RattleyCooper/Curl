@@ -98,7 +98,7 @@ $curler->verbose();
 
 ##### Write Response to File
 
-__multi-request support coming soon.__
+_multi-request support coming soon._
 
 ```php
 $curler->writeResponse('someDirectory/Filename');
