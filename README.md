@@ -19,30 +19,57 @@ Documentation is located in the `Curler.php` file for now, but examples on usage
 
 ## Examples
 
-#### Getting a web-page
-Grab the HTML for a web page to be displayed in the web browser without rendering the HTML.
+##### Creat the Curler instance.
+
 ```php
 $curler = new Curler('https://github.com/');
+```
 
-$curler->followRedirects() // Will follow redirects option set to true.
-    ->header('Connection', 'keep-alive')  // Set some headers
-    ->header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
-    ->header('Accept-Language', 'en-US,en;q=0.5')
-    ->header('Host', 'github.com')
-    ->header('Content-Type', 'application/x-www-form-urlencoded')
-    ->cookieJar('gitCookie') // Set a file to use as cookie jar.
-    ->suppressOutput() // Sets the RETURNTRANSFER option to true so that output is fetched as string instead of displayed automatically.
-    ->suppressRender() // Display in browser as HTML text instead of rendering the HTML.  Great for debugging!
+##### Post information
+
+```php
+$curler->post('fname', 'John')
+    ->post('lname', 'Doe')
 ;
+$curler->postArray(['fname'=>'John', 'lname'=>'Doe']);
+```
 
-$html = $curler->go(); // Replace go() with dryRun() to get debug info on the request without executing it.
-var_dump($html);
+##### Set headers
+
+```php
+$curler->header('Connection', 'keep-alive')
+    ->header('Host', 'github.com')
+;
+$curler->headerArray(['Connection'=>'keep-alive', 'Host'=>'github.com']);
+```
+
+##### Set User Agent or Referer
+
+```php
+$ua = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:40.0) Gecko/20100101 Firefox/40.0';
+
+$curler->userAgent($ua)
+    ->referer('http://github.com');
+```
+
+##### Save cookies
+
+```php
+$curler->cookieJar('SomeDirectory/testCookie');
+```
+
+##### Follow Browser Redirects
+
+```php
+$curler->followRedirects();
 ```
 
 #### Preforming a multi-request
+
 You can send asynchronous requests as well!  This can be accomplished through the use of curler by
 adding URLs to the request(this retains any options that have been set in Curler up to this point),
-or by adding cURL handles to the request.
+or by adding cURL handles to the request(adding handles as opposed to urls is somewhat untested.  
+It's in the works though).
 
 ```php
 $curler = new Curler('https://github.com/');
@@ -62,26 +89,18 @@ $headers = [
 
 $cj = '/home/parker/testCookie';
 
-$curler->followRedirects()
-    ->headerArray($headers)
-    ->cookieJar($cj)
-    ->multiCookie()
-    ->suppressOutput()
-    ->suppressRender()
-    ->setHeaders()
-    ->setPostFields()
+$curler->followRedirects()      // Exactly how it sounds.
+    ->headerArray($headers)     // Add an array of headers.
+    ->cookieJar($cj)            // Set a location for cookies.
+    ->multiCookie()             // Enables a separate cookie for each request(numbered).
+    ->returnText()              // Don't display response.  Get a text string.
+    ->suppressRender()          // This will suppress the html from rendering if it is echoed.
+    ->addUrl($urls)             // Add urls to the multi-request..
+    ->addUrl('http://php.net/') // or add them individually.
 ;
 
-foreach ( $urls as $url )
-{
-    $curler->addUrl($url); // $curler->addHandle($validCurlHandle); would work as well.
-}
-
 $html = $curler->goMulti()->multi_response;
-
-/*
-Returns an array containing each requests response as it's own item, in the array.
-*/
+var_dump($html);
  ```
 
 #### Debugging a request
