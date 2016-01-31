@@ -15,7 +15,9 @@ Note: This repo is in its infancy and may not be suitable for all
 applications, however it is great for simple and semi-advanced 
 requests.
 
-Documentation is located in the `Curler.php` file for now, but examples on usage will be added.
+To "Install", just drop the Curler.php script into your project, and give it a namespace if needed.
+
+Full documentation coming soon.
 
 ## Examples
 
@@ -25,6 +27,8 @@ Documentation is located in the `Curler.php` file for now, but examples on usage
 $curler = new Curler('https://github.com/');
 ```
 
+__Note that all of the following methods can be chained together unless noted otherwise__
+
 ##### Post information
 
 ```php
@@ -32,6 +36,12 @@ $curler->post('fname', 'John')
     ->post('lname', 'Doe')
 ;
 $curler->postArray(['fname'=>'John', 'lname'=>'Doe']);
+```
+
+##### Preform a GET request
+
+```php
+$curler->get();
 ```
 
 ##### Set headers
@@ -62,6 +72,36 @@ $curler->cookieJar('SomeDirectory/testCookie');
 
 ```php
 $curler->followRedirects();
+```
+
+##### Compressed Responses
+
+You can tell `Curler` you expect a compressed response from the request with `compressedResponse()`.
+
+```php
+$curler->compressedResponse()
+```
+
+##### Upload a File
+
+Just give a form input name and a filepath.
+
+```php
+$curler->upload('file', 'filepath');
+```
+
+##### Verbose Output
+
+```php
+$curler->verbose();
+```
+
+##### Write Response to File
+
+__multi-request support coming soon.__
+
+```php
+$curler->writeResponse('someDirectory/Filename');
 ```
 
 #### Preforming a multi-request
