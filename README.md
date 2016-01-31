@@ -38,13 +38,13 @@ $curler->post('fname', 'John')
 $curler->postArray(['fname'=>'John', 'lname'=>'Doe']);
 ```
 
-##### Preform a GET request
+##### Switch From POST to a GET request
 
 ```php
 $curler->get();
 ```
 
-##### Set headers
+##### Set Headers
 
 ```php
 $curler->header('Connection', 'keep-alive')
@@ -62,7 +62,7 @@ $curler->userAgent($ua)
     ->referer('http://github.com');
 ```
 
-##### Save cookies
+##### Save Cookies
 
 ```php
 $curler->cookieJar('SomeDirectory/testCookie');
@@ -104,7 +104,7 @@ _multi-request support coming soon._
 $curler->writeResponse('someDirectory/Filename');
 ```
 
-#### Preforming a multi-request
+#### Preforming a Multi-Request
 
 You can send asynchronous requests as well!  This can be accomplished through the use of curler by
 adding URLs to the request(this retains any options that have been set in Curler up to this point),
