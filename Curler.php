@@ -1,16 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: parker
- * Date: 9/2/15
- * Time: 7:26 AM
- */
-
-/**
  * A fluent API wrapper for libcurl in php.  Setting options and headers is done using
  * method chaining instead of setting options explicitly using the libcurl constants.
  *
- * Debugging cURL commands in php using the Curler class is insanely simple as well.
+ * Debugging cURL commands in php using the Curler class is really simple as well.
  * Just chain the `dryRun()` method onto the end of your method chain instead of
  * the `go()` method and it will dump out all of the cURL request information.
  *
@@ -20,7 +13,7 @@
  * applications, however it is great for simple requests!  Multi-
  * requests will be coming soon(hopefully)!
  *
- * Todo: Clean up code / make it more readable.  Add more usage examples to github.
+ * Todo: Clean up code / make it more readable.  Create documentation.
  */
 class Curler
 {
