@@ -115,7 +115,7 @@ or by adding cURL handles to the request(adding handles as opposed to urls is so
 It's in the works though).
 
 ```php
-$curler = new Curler('https://github.com/');
+$curler = new AsyncCurler('https://github.com/');  // Instantiate with the first URL to use.
 
 $urls = [
     'http://pastebin.com/',
@@ -142,7 +142,7 @@ $curler->followRedirects()      // Exactly how it sounds.
     ->addUrl('http://php.net/') // or add them individually.
 ;
 
-$html = $curler->goMulti()->multi_response;
+$html = $curler->go()->multi_response;
 var_dump($html);
  ```
 
