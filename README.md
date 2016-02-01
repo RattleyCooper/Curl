@@ -1,6 +1,5 @@
 # Curler
 
-
 A fluent API wrapper for libcurl in php.  Setting options and headers is done using
 method chaining instead of setting options explicitly using the libcurl constants.
 
@@ -11,7 +10,7 @@ without making the request.
  
 See http://php.net/manual/en/book.curl.php for information on libcurl.
 
-Note: This repo is in its infancy and may not be suitable for all
+Note: This library is in its infancy and may not be suitable for all
 applications, however it is great for simple and semi-advanced 
 requests.
 
