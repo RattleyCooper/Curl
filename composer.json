@@ -4,6 +4,13 @@
     "homepage":             "https://github.com/Wykleph/Curl",
     "keywords": [
         "curl",
+        "spider",
+        "crawler",
+        "scraper",
+        "bot",
+        "http",
+        "prallel",
+        "multi-thread",
         "web",
         "internet",
         "automation",
