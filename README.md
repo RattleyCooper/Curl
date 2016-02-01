@@ -24,6 +24,8 @@ Add `wykleph/curl` to your composer.json file or:
 
 `composer require "wykleph/curl"
 
+You could also just copy the files in the `src` directory into your project if you aren't using composer, however I would recommend it.
+
 ##### Creat the Curler instance.
 
 ```php
