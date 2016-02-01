@@ -109,8 +109,8 @@ $curler->writeResponse('someDirectory/Filename');
 
 #### Preforming an Asynchronous Request, or Multi-Request
 
-You can send asynchronous requests as well!  This can be accomplished through the use of curler by
-adding URLs to the request(this retains any options that have been set in Curler up to this point),
+You can send asynchronous requests as well!  This can be accomplished through the use of AsyncCurler by
+adding URLs to the request(this retains any options that have been set in AsyncCurler up to this point),
 or by adding cURL handles to the request(adding handles as opposed to urls is somewhat untested.  
 It's in the works though).
 
