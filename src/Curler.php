@@ -1,10 +1,9 @@
-
 <?php
 /**
  * A fluent API wrapper for libcurl in php.  Setting options and headers is done using
  * method chaining instead of setting options explicitly using the libcurl constants.
  *
- * Debugging cURL commands in php using the Curler class is really simple as well.
+ * Debugging cURL commands in php using the Curler class is insanely simple as well.
  * Just chain the `dryRun()` method onto the end of your method chain instead of
  * the `go()` method and it will dump out all of the cURL request information.
  *
@@ -14,8 +13,9 @@
  * applications, however it is great for simple requests!  Multi-
  * requests will be coming soon(hopefully)!
  *
- * Todo: Clean up code / make it more readable.  Create documentation.
+ * Todo: Clean up code / make it more readable.  Add more usage examples to github.
  */
+
 class Curler
 {
     public $url;
@@ -192,9 +192,11 @@ class Curler
     }
 
     /**
-     * Add a url to the list of urls to create cURL handles out of.  These handles will inherit
-     * the same options and headers as the parent cURL handle that was created and modified
-     * with Curler.
+     * Add a url to the list of urls to create cURL handles out of.
+     *
+     * These handles will inherit the same options and headers as
+     * the parent cURL handle that was created and modified with
+     * Curler.
      *
      * @param $url
      * @return $this
@@ -206,6 +208,17 @@ class Curler
         return $this;
     }
 
+    /**
+     * Add an array of urls to the list of urls to create cURL handles out of.
+     *
+     * These handles will inherit the same options and headers as
+     * the parent cURL handle that was created and modified with
+     * Curler.
+     *
+     * @param $urls
+     * @return $this
+     * @throws Exception
+     */
     public function addUrls($urls)
     {
         if ( ! is_array($urls) )
@@ -475,7 +488,7 @@ class Curler
      *
      * @return $this
      */
-    public function goMulti()
+    public function goMulti($chunk = false)
     {
         // Set the headers and post fields like in the `go()` method.
         if ( ! $this->headers_set ) { $this->setHeaders(); }
@@ -568,25 +581,6 @@ class Curler
             $this->header($name, $value);
         }
         return $this;
-    }
-
-    /**
-     * Log into service.
-     *
-     * @param $username
-     * @param $password
-     * @param LoginInterface $loginHandler
-     * @param array $extraAttributes
-     * @return mixed
-     */
-    public function login($username, $password, LoginInterface $loginHandler, $extraAttributes = [])
-    {
-        $loginHandler->setUsername($username)
-            ->setPassword($password)
-            ->setAttributes($extraAttributes)
-        ;
-
-        return $loginHandler->login();
     }
     
     /**
@@ -866,6 +860,12 @@ class Curler
         return $this;
     }
 
+    /**
+     * Set the post string that should be used in the POST request.
+     *
+     * @param $postString
+     * @return $this
+     */
     public function setPostString($postString)
     {
         $this->poststring = $postString;
@@ -1031,7 +1031,7 @@ class Curler
      * @param $filename
      * @return $this
      */
-public function writeResponse($filename)
+    public function writeResponse($filename)
     {
         file_put_contents($filename, $this->response);
         return $this;
