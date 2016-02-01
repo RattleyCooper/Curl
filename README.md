@@ -15,11 +15,15 @@ Note: This repo is in its infancy and may not be suitable for all
 applications, however it is great for simple and semi-advanced 
 requests.
 
-To "Install", just drop the Curler.php script into your project, and give it a namespace if needed.
-
 Full documentation coming soon.
 
-## Examples
+## Getting Started
+
+##### Install using Composer
+
+Add `wykleph/curl` to your composer.json file or:
+
+`composer require "wykleph/curl"
 
 ##### Creat the Curler instance.
 
@@ -27,7 +31,7 @@ Full documentation coming soon.
 $curler = new Curler('https://github.com/');
 ```
 
-__Note that all of the following methods can be chained together unless noted otherwise__
+_Note that all of the following methods can be chained together unless noted otherwise_
 
 ##### Post information
 
