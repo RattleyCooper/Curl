@@ -117,7 +117,7 @@ or by adding cURL handles to the request(adding handles as opposed to urls is so
 It's in the works though).
 
 ```php
-$curler = new AsyncCurler('https://github.com/');  // Instantiate with the first URL to use.
+$curler = new AsyncCurler('https://github.com/');
 
 $urls = [
     'http://pastebin.com/',
@@ -132,19 +132,19 @@ $headers = [
     'Content-Type'      =>      'application/x-www-form-urlencoded'
 ];
 
-$cj = '/home/parker/testCookie';
+$cookieJar = '/home/user/testCookie';
 
-$curler->followRedirects()      // Exactly how it sounds.
-    ->headerArray($headers)     // Add an array of headers.
-    ->cookieJar($cj)            // Set a location for cookies.
-    ->multiCookie()             // Enables a separate cookie for each request(numbered).
-    ->returnText()              // Don't display response.  Get a text string.
-    ->suppressRender()          // This will suppress the html from rendering if it is echoed.
-    ->addUrl($urls)             // Add urls to the multi-request..
-    ->addUrl('http://php.net/') // or add them individually.
-;
+$curler->followRedirects()          // Exactly how it sounds.
+    ->headerArray($headers)         // Add an array of headers.
+    ->cookieJar($cookieJar)         // Set a location for cookies.
+    ->returnText()                  // Don't display response.  Get a text string.
+    ->suppressRender()              // This will suppress the html from rendering if it is echoed.
+    ->addUrl($urls)                 // Add urls to the multi-request..
+    ->addUrl('http://php.net/');    // or add them individually.
 
-$html = $curler->go()->multi_response;
+
+$html = $curler->go()->getResponse();
+
 var_dump($html);
  ```
 
