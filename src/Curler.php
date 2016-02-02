@@ -1,5 +1,8 @@
 <?php
+
 /**
+ * Class Curler
+ *
  * A fluent API wrapper for libcurl in php.  Setting options and headers is done using
  * method chaining instead of setting options explicitly using the libcurl constants.
  *
@@ -13,9 +16,8 @@
  * applications, however it is great for simple requests!  Multi-
  * requests will be coming soon(hopefully)!
  *
- * Todo: Clean up code / Add more usage examples to github
+ * Todo: Clean up code / Add more usage examples to github.
  */
-
 class Curler
 {
     public $url;
