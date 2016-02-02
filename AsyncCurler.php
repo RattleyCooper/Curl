@@ -25,6 +25,9 @@ class AsyncCurler extends Curler
 
     public $optionsMap;
 
+    public $responses_filepath;
+    public $write_responses;
+
     public function __construct()
     {
         $this->setDefault();
@@ -77,6 +80,9 @@ class AsyncCurler extends Curler
 
         $this->poststring = '';
         $this->postfields = [];
+
+        $this->responses_filepath = null;
+        $this->write_responses = false;
 
         return $this;
     }
@@ -144,7 +150,7 @@ class AsyncCurler extends Curler
         {
             try {
                 curl_multi_remove_handle($this->cmh, $handle);
-            } catch (Exception $e) { /* If there are errors, no worries. */ }
+            } catch (\Exception $e) { /* If there are errors, no worries. */ }
         }
         return $this;
     }
@@ -158,7 +164,7 @@ class AsyncCurler extends Curler
     {
         try{
             curl_multi_close($this->cmh);
-        } catch ( Exception $e ) { /* It's probably fine... */ }
+        } catch ( \Exception $e ) { /* It's probably fine... */ }
 
         return $this;
     }
@@ -228,13 +234,13 @@ class AsyncCurler extends Curler
      *
      * @param $urls
      * @return $this
-     * @throws Exception
+     * @throws \Exception
      */
     public function addUrls($urls)
     {
         if ( ! is_array($urls) )
         {
-            throw new \Exception("");
+            throw new \Exception("addUrls() takes an array of URLs...");
         }
 
         foreach ( $urls as $url )
@@ -268,8 +274,11 @@ class AsyncCurler extends Curler
      *
      * @return $this
      */
-    public function go()
+    public function go($timelimit=30, $memory='128M')
     {
+        ini_set('memory_limit', $memory);
+        set_time_limit($timelimit);
+
         // Automatically set teh multiCookie option if needed.
         if ( count($this->urls) > 1 or count($this->handles) > 1 )
         {
@@ -368,16 +377,62 @@ class AsyncCurler extends Curler
         foreach ( $this->handles as $hKey => $handle )
         {
             // Should the output HTML be renderable?
-            if ( $this->noRender )
+            if ( $this->noRender and ! $this->write_responses )
             {
                 $this->multi_response[$hKey] = htmlspecialchars(curl_multi_getcontent($handle));
-            } else
+            }
+            // Should we write the responses to files instead of tracking them locally?
+            elseif ( $this->write_responses )
+            {
+                $link = curl_getinfo($handle)['url'];
+                $ext = $this->getFileExtension($link);
+                $content = curl_multi_getcontent($handle);
+                $id = md5($content);
+                $filepath = "{$this->responses_filepath}{$id}.{$ext}";
+
+                $this->writeResponse($filepath, $content);
+            }
+            else
             {
                 $this->multi_response[$hKey] = curl_multi_getcontent($handle);
             }
 
             curl_multi_remove_handle($this->cmh, $handle);
         }
+        return $this;
+    }
+
+    public function getFileExtension($link)
+    {
+        $linkList = explode('.', $link);
+        $arrayLength =  count($linkList);
+        return $linkList[$arrayLength - 1];
+    }
+
+    /**
+     * Write the response to a file.
+     *
+     * @param $filepath
+     * @param $response
+     * @return $this
+     */
+    public function writeResponse($filepath, $response)
+    {
+        file_put_contents($filepath, $response);
+        return $this;
+    }
+
+    /**
+     * Tell AsyncCurler to write responses to files instead of tracking them in memory.
+     *
+     * @param $filepath
+     * @param bool $bool
+     * @return $this
+     */
+    public function writeResponses($filepath)
+    {
+        $this->responses_filepath = $filepath;
+        $this->write_responses = true;
         return $this;
     }
 }
