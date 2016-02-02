@@ -13,7 +13,7 @@
  * applications, however it is great for simple requests!  Multi-
  * requests will be coming soon(hopefully)!
  *
- * Todo: Clean up code / make it more readable.  Add more usage examples to github.
+ * Todo: Clean up code / Add more usage examples to github
  */
 
 class Curler
