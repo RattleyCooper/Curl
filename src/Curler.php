@@ -443,6 +443,9 @@ class Curler
     /**
      * Set a file to write the output to.  You must give this method an open file stream.
      *
+     * Note: AsyncCurler support coming soon.
+     * todo: add AsyncCurler support.
+     *
      * See http://php.net/manual/en/function.curl-setopt.php for more information.
      *
      * @curl_option CURLOPT_STDERR
