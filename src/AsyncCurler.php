@@ -18,9 +18,9 @@ class AsyncCurler extends Curler
 
     public $optionsMap;
 
-    public function __construct($url)
+    public function __construct()
     {
-        $this->setDefault($url);
+        $this->setDefault();
         return $this;
     }
 
@@ -31,12 +31,12 @@ class AsyncCurler extends Curler
         $this->closeMultiHandle();
     }
 
-    public function __invoke($url)
+    public function __invoke()
     {
         $this->removeHandles();
         $this->closeHandles($this->handles);
         $this->closeMultiHandle();
-        $this->setDefault($url);
+        $this->setDefault();
         return $this;
     }
 
@@ -46,7 +46,7 @@ class AsyncCurler extends Curler
      * @param $url
      * @return $this
      */
-    private function setDefault($url)
+    private function setDefault()
     {
         $this->optionsMap = [
             '-b'            =>  'CURLOPT_COOKIEFILE',
@@ -58,7 +58,7 @@ class AsyncCurler extends Curler
             '--connect-timeout'=>'CURLOPT_CONNECTTIMEOUT'
         ];
 
-        $this->ch = curl_init($url);
+        $this->ch = curl_init();
         $this->cmh = curl_multi_init();
 
         $this->urls = [];
@@ -264,7 +264,15 @@ class AsyncCurler extends Curler
      */
     public function go()
     {
-        $this->multiCookie();
+        // Automatically set teh multiCookie option if needed.
+        if ( count($this->urls) > 1 or count($this->handles) > 1 )
+        {
+            $this->multiCookie();
+        }
+
+        // Instantiate cURL handle to act as template.
+        curl_setopt($this->ch, CURLOPT_URL, $this->urls[0]);
+        unset($this->urls[0]);
 
         // Set the headers and post fields like in the `go()` method.
         if ( ! $this->headers_set ) { $this->setHeaders(); }
