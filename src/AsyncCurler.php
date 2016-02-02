@@ -37,6 +37,7 @@ class AsyncCurler extends Curler
         $this->closeHandles($this->handles);
         $this->closeMultiHandle();
         $this->setDefault($url);
+        return $this;
     }
 
     /**
@@ -114,6 +115,16 @@ class AsyncCurler extends Curler
             $this->closeHandle($ch);
         }
         return $this;
+    }
+
+    /**
+     * Get the response from the last request
+     *
+     * @return bool | $this->multi_response
+     */
+    public function getResponse()
+    {
+        return ( ! $this->multi_response) ? false : $this->multi_response ;
     }
 
     /**
@@ -253,6 +264,8 @@ class AsyncCurler extends Curler
      */
     public function go()
     {
+        $this->multiCookie();
+
         // Set the headers and post fields like in the `go()` method.
         if ( ! $this->headers_set ) { $this->setHeaders(); }
         if ( ! $this->postfields_set ) { $this->setPostFields(); }
