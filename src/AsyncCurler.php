@@ -1,5 +1,7 @@
 <?php
 
+namespace Wykleph\Curler;
+
 /**
  * Class AsyncCurler
  *
