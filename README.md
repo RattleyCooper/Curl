@@ -10,9 +10,7 @@ without making the request.
  
 See http://php.net/manual/en/book.curl.php for information on libcurl.
 
-Note: This library is in its infancy and may not be suitable for all
-applications, however it is great for simple and semi-advanced 
-requests.
+Note: This library is in its infancy.
 
 Full documentation coming soon.
 
