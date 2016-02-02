@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class AsyncCurler
+ *
+ * Asynchronous requests with cURL.
+ */
 class AsyncCurler extends Curler
 {
     public $ch;
@@ -43,7 +48,6 @@ class AsyncCurler extends Curler
     /**
      * Set the class back to default settings.
      *
-     * @param $url
      * @return $this
      */
     private function setDefault()
