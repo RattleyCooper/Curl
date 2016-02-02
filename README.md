@@ -117,9 +117,10 @@ or by adding cURL handles to the request(adding handles as opposed to urls is so
 It's in the works though).
 
 ```php
-$curler = new AsyncCurler('https://github.com/');
+$curler = new AsyncCurler();
 
 $urls = [
+    'https://github.com/',
     'http://pastebin.com/',
     'https://google.com/',
     'http://yahoo.com/'
