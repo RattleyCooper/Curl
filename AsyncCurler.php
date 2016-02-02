@@ -419,13 +419,12 @@ class AsyncCurler extends Curler
     /**
      * Tell AsyncCurler to write responses to files instead of tracking them in memory.
      *
-     * @param $filepath
-     * @param bool $bool
+     * @param $folderpath
      * @return $this
      */
-    public function writeResponses($filepath)
+    public function writeResponses($folderpath)
     {
-        $this->responses_filepath = $filepath;
+        $this->responses_filepath = $folderpath;
         $this->write_responses = true;
         return $this;
     }
