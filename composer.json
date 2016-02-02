@@ -17,7 +17,8 @@
     "asynchronous",
     "web request",
     "requests",
-    "request"
+    "request",
+    "MIT"
   ],
   "type":                 "library",
   "license":              "MIT",
