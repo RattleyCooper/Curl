@@ -76,7 +76,7 @@ class AsyncCurler extends Curler
         $this->additionalCookies = [];
 
         $this->multi_active = null;
-        $this->multi_cookie = true;
+        $this->multi_cookie = false;
 
         $this->poststring = '';
         $this->postfields = [];
