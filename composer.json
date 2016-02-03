@@ -30,7 +30,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.5.29",
+    "php": ">=5.5.9",
     "ext-curl": "*"
   },
   "autoload": {
