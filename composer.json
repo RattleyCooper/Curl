@@ -29,10 +29,7 @@
     }
   ],
   "minimum-stability": "dev",
-  "require": {
-    "php": ">=5.5",
-    "ext-curl": "*"
-  },
+  "require": {},
   "autoload": {
     "psr-4": {
       "Wykleph\\Curler\\": ""
